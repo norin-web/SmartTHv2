@@ -6,7 +6,7 @@ React 18 + TypeScript + Vite 6 + Tailwind CSS 4 + React Router 7. Deployed to Gi
 
 ```bash
 pnpm install
-pnpm dev      # http://localhost:5173/SmartTHv2/
+pnpm dev      # http://localhost:5173/
 pnpm build    # → dist/
 ```
 
@@ -17,8 +17,8 @@ In the repo settings, **Pages → Source** must be **GitHub Actions**.
 
 ### `base` and the custom domain
 
-- No domain (now): `base: "/SmartTHv2/"` in `vite.config.ts`, no `public/CNAME`. The site lives at `https://norin-web.github.io/SmartTHv2/`.
-- With a domain: set `base: "/"` **and** add `public/CNAME` with the bare domain **in the same commit**, then save the domain in Pages settings. A wrong `base` gives a blank white page.
+- Now: custom domain `smartthingsremote.site` — `base: "/"` in `vite.config.ts` and `public/CNAME` with the bare domain. Both must change together.
+- If the domain is removed: set `base: "/SmartTHv2/"` and delete `public/CNAME` in the same commit; the site then lives at `https://norin-web.github.io/SmartTHv2/`. A wrong `base` gives a blank white page.
 
 All image paths go through `img()` (`src/app/utils/img.ts`), so they follow `base` automatically.
 
