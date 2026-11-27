@@ -31,6 +31,8 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm run build
       - run: cp dist/index.html dist/404.html
+      # real pages for every route, so direct links (e.g. /privacy for the App Store) answer 200, not 404
+      - run: for r in app about support contact feedback privacy terms; do mkdir -p dist/$r && cp dist/index.html dist/$r/index.html; done
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
