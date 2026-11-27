@@ -1,11 +1,11 @@
-import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link } from "react-router";
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { NavLink } from "react-router";
+import { ChevronDown, Search } from "lucide-react";
 import { site } from "../content/site";
-import { legalUpdated, type LegalDoc } from "../content/legal";
+import type { LegalDoc } from "../content/legal";
 import Split from "./Split";
-import Btn from "./Btn";
 
-type Section = { id: string; title: string; blocks: string[] };
+type Section = { id: string; title: string; blocks: string[]; text: string };
 
 // turn plain email addresses into mailto links, text otherwise untouched
 const linkify = (text: string) =>
@@ -22,9 +22,12 @@ function parse(body: string) {
   for (const block of body.split(/\n{2,}/)) {
     if (block.startsWith("## ")) {
       const title = block.slice(3);
-      sections.push({ id: slug(title), title, blocks: [] });
-    } else if (sections.length) sections[sections.length - 1].blocks.push(block);
-    else if (block.trim()) intro.push(block);
+      sections.push({ id: slug(title), title, blocks: [], text: title.toLowerCase() });
+    } else if (sections.length) {
+      const s = sections[sections.length - 1];
+      s.blocks.push(block);
+      s.text += " " + block.toLowerCase();
+    } else if (block.trim()) intro.push(block);
   }
   return { intro, sections };
 }
@@ -37,10 +40,8 @@ function Block({ text }: { text: string }): ReactNode {
         {text.split("\n").map((li, j) => <li key={j}>{linkify(li.replace(/^- /, ""))}</li>)}
       </ul>
     );
-  // all-caps legal clauses get a quiet box so they don’t shout across the page
-  const caps = text.length > 40 && text === text.toUpperCase();
   return (
-    <p className={caps ? "legal-caps" : undefined}>
+    <p>
       {text.split("\n").map((line, i) => (
         <Fragment key={i}>
           {i > 0 && <br />}
@@ -51,112 +52,109 @@ function Block({ text }: { text: string }): ReactNode {
   );
 }
 
+/**
+ * Legal document page: a Privacy / Terms switch, a search that narrows the
+ * sections, collapsible sections and a reading-progress line under the header.
+ */
 export default function LegalPage({ doc }: { doc: LegalDoc }) {
   const { intro, sections } = useMemo(() => parse(doc.body ?? ""), [doc.body]);
-  const [active, setActive] = useState(sections[0]?.id);
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState<Set<string>>(() => new Set(sections.slice(0, 1).map((s) => s.id)));
+  const bar = useRef<HTMLSpanElement>(null);
+  const article = useRef<HTMLDivElement>(null);
 
-  // highlight the section whose heading last passed the upper third of the viewport
+  const query = q.trim().toLowerCase();
+  const shown = query ? sections.filter((s) => s.text.includes(query)) : sections;
+  const allOpen = shown.length > 0 && shown.every((s) => open.has(s.id));
+
+  // reading progress through the document body
   useEffect(() => {
-    if (!sections.length) return;
-    const onScroll = () => {
-      let cur = sections[0]?.id;
-      for (const s of sections) {
-        const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top < innerHeight * 0.35) cur = s.id;
-      }
-      setActive(cur);
+    const update = () => {
+      const el = article.current;
+      if (!el || !bar.current) return;
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (innerHeight * 0.5 - r.top) / Math.max(1, r.height - innerHeight * 0.5)));
+      bar.current.style.transform = `scaleX(${p})`;
     };
-    onScroll();
-    addEventListener("scroll", onScroll, { passive: true });
-    return () => removeEventListener("scroll", onScroll);
-  }, [sections]);
+    update();
+    addEventListener("scroll", update, { passive: true });
+    addEventListener("resize", update);
+    return () => {
+      removeEventListener("scroll", update);
+      removeEventListener("resize", update);
+    };
+  }, [shown.length, open]);
 
-  const go = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 96, behavior: "smooth" });
+  const toggle = (id: string) => {
+    const next = new Set(open);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setOpen(next);
   };
 
   return (
     <>
-      <section className="dhero">
-        <div className="container">
-          <p className="dhero__date">{doc.body ? `Effective ${legalUpdated}` : "Coming soon"}</p>
-          <Split as="h1" className="h1" parts={[[doc.title]]} />
-          <div className="dhero__meta">
-            {sections.length > 0 && <span>{sections.length} sections</span>}
-            <a href={`mailto:${site.email}`}>{site.email}</a>
-            <Link to={doc.other.to}>{doc.other.label}</Link>
-          </div>
-        </div>
-      </section>
+      <div className="lprogress" aria-hidden="true"><span ref={bar} /></div>
 
-      <section className="legal">
-        <div className={`container ${sections.length ? "legal__grid" : "container--narrow"}`}>
-          {sections.length > 0 && (
-            <nav className="legal__toc" aria-label="Contents">
-              <ol>
-                {sections.map((s, i) => (
-                  <li key={s.id}>
-                    <button
-                      className={active === s.id ? "is-on" : ""}
-                      onClick={() => go(s.id)}
-                      aria-current={active === s.id ? "true" : undefined}
-                      aria-label={s.title}
-                      title={s.title}
-                    >
-                      <b>{i + 1}</b>
-                      <i aria-hidden="true" />
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
+      <section className="ldoc">
+        <div className="container container--doc">
+          <nav className="w-seg ldoc__switch" aria-label="Documents">
+            <NavLink to="/privacy" className={({ isActive }) => (isActive ? "is-on" : "")}>Privacy Policy</NavLink>
+            <NavLink to="/terms" className={({ isActive }) => (isActive ? "is-on" : "")}>Terms of Use</NavLink>
+          </nav>
+          <Split as="h1" className="h1 ldoc__title" parts={[[doc.title]]} />
 
-          <article className="legal__body">
-            {!doc.body && (
-              <div className="legal__soon">
-                <h2>The full {doc.title} will be published here.</h2>
-                <p>
-                  Until then, write to <a href={`mailto:${site.email}`}>{site.email}</a> with any question about {doc.title === "Privacy Policy" ? "your data" : "using the app"}.
+          {!doc.body ? (
+            <p className="lead">
+              The full {doc.title} will be published here. Until then, write to <a className="link" href={`mailto:${site.email}`}>{site.email}</a>.
+            </p>
+          ) : (
+            <>
+              {intro.map((t, i) => (
+                <p className="ldoc__intro" key={i}>{linkify(t)}</p>
+              ))}
+
+              <div className="ldoc__tools">
+                <label className="ldoc__search">
+                  <Search size={18} aria-hidden="true" />
+                  <span className="sr-only">Search this document</span>
+                  <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search the ${doc.title.toLowerCase()}`} />
+                </label>
+              </div>
+              <div className="ldoc__row">
+                <p className="ldoc__count" aria-live="polite">
+                  {query ? `${shown.length} of ${sections.length} sections match` : `${sections.length} sections`}
                 </p>
+                <button
+                  className="ldoc__all"
+                  onClick={() => setOpen(allOpen ? new Set() : new Set([...open, ...shown.map((s) => s.id)]))}
+                  disabled={!shown.length}
+                >
+                  {allOpen ? "Collapse all" : "Expand all"}
+                </button>
               </div>
-            )}
 
-            {doc.glance && doc.glance.length > 0 && (
-              <div className="glance">
-                <h2>At a glance</h2>
-                <div className="glance__grid">
-                  {doc.glance.map(([h, t]) => (
-                    <div className="glance__card" key={h}>
-                      <b>{h}</b>
-                      <span>{t}</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="glance__note">A short summary for convenience. The full text below is what applies.</p>
+              <div className="ldoc__list" ref={article}>
+                {shown.map((s) => {
+                  const on = open.has(s.id) || !!query;
+                  return (
+                    <section className={`lsec${on ? " is-open" : ""}`} id={s.id} key={s.id}>
+                      <h2>
+                        <button aria-expanded={on} aria-controls={`${s.id}-body`} onClick={() => toggle(s.id)}>
+                          <span>{s.title}</span>
+                          <ChevronDown size={22} aria-hidden="true" />
+                        </button>
+                      </h2>
+                      <div className="lsec__body" id={`${s.id}-body`} hidden={!on}>
+                        {s.blocks.map((b, j) => <Block key={j} text={b} />)}
+                      </div>
+                    </section>
+                  );
+                })}
+                {!shown.length && <p className="ldoc__none">Nothing found for “{q}”. Try another word.</p>}
               </div>
-            )}
-
-            {intro.map((t, i) => (
-              <p className="legal__intro" key={i}>{linkify(t)}</p>
-            ))}
-
-            {sections.map((s, i) => (
-              <section className="lsec" id={s.id} key={s.id}>
-                <h2>{s.title}</h2>
-                {s.blocks.map((b, j) => <Block key={j} text={b} />)}
-              </section>
-            ))}
-
-            <div className="legal__ask">
-              <div>
-                <h2>Questions?</h2>
-                <p>Write to <a href={`mailto:${site.email}`}>{site.email}</a> and we’ll get back to you.</p>
-              </div>
-              <Btn to="/contact" variant="dark">Contact us</Btn>
-            </div>
-          </article>
+            </>
+          )}
         </div>
       </section>
     </>

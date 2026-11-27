@@ -20,6 +20,7 @@ function Hero() {
           <div className="hero__cta">
             <Btn href={app.url}>Download on the App Store</Btn>
           </div>
+          <p className="hero__note">Free on the App Store, iOS {app.minIOS} or later</p>
           <ul className="checks">
             {heroChecks.map((c) => (
               <li key={c}><span className="checks__i"><Check size={13} strokeWidth={2.6} /></span>{c}</li>
@@ -36,7 +37,7 @@ function Hero() {
           </div>
         </div>
         <div className="hero__panel">
-          <img className="phone hero__phone" src={img("/images/phone-home.webp")} alt="Smart Things Home Manager Home screen with a speaker, an air conditioner and a smart lamp" width={720} height={1560} />
+          <img className="phone hero__phone" src={img("/images/phone-home.webp")} alt="Smart Things: Remote Control Home screen with a speaker, an air conditioner and a smart lamp" width={720} height={1560} />
         </div>
       </div>
     </section>

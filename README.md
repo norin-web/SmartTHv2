@@ -1,4 +1,4 @@
-# Smart Things Home Manager — promo site
+# Smart Things: Remote Control — promo site
 
 React 18 + TypeScript + Vite 6 + Tailwind CSS 4 + React Router 7. Deployed to GitHub Pages by GitHub Actions.
 
@@ -24,8 +24,8 @@ All image paths go through `img()` (`src/app/utils/img.ts`), so they follow `bas
 
 ## Where the content lives
 
-- `src/app/content/site.ts` — brand, operator, email, App Store ID and link, nav, features, devices, FAQ. Values marked `PLACEHOLDER` still need the owner's data.
-- `src/app/content/legal.ts` — Privacy Policy and Terms of Use. Paste the owner's texts **verbatim** into `body` (only `## ` headings and `- ` lists as markup).
+- `src/app/content/site.ts` — brand, operator, email, App Store ID and link, nav, features, devices, FAQ. Store facts come from the iTunes lookup for id 6757602001.
+- `src/app/content/legal.ts` — Privacy Policy and Terms of Use. The owner's texts are pasted **verbatim** into `body` (only `## ` / `### ` headings and `- ` lists as markup).
 - `public/images/` — app screens in an iPhone frame (`phone-*.webp`), app icon.
 
 ## Reveal animations

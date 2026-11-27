@@ -1,24 +1,25 @@
 // Every brand / app fact lives here so names, IDs and emails are never duplicated.
-// PLACEHOLDER values are waiting for the owner — replace them before release.
-// Feature wording follows the app’s own screens (onboarding, Home, Add Device,
-// Wi‑Fi, AirPlay and device screens); nothing here goes beyond them.
-
-export const PLACEHOLDER = "PLACEHOLDER";
+// Store facts: iTunes lookup id=6757602001 (2026-11-27). Operator, email and the
+// brand-authorization wording come from the owner's Privacy Policy and Terms of Use.
+// Feature wording follows the app's own screens; nothing here goes beyond them.
 
 export const site = {
-  brand: "Smart Things Home Manager",
+  brand: "Smart Things: Remote Control",
   short: "Smart Things",
-  email: "support@PLACEHOLDER.com", // PLACEHOLDER — operator email
+  email: "thijsvries1app@hotmail.com",
   year: new Date().getFullYear(),
-  operator: PLACEHOLDER, // company that publishes the app
+  operator: "Mila Veenstra",
+  // wording follows section 10 of the Privacy Policy / section 6 of the Terms
   disclaimer:
-    "Smart Things Home Manager is an independent app. It is not affiliated with, endorsed by or sponsored by Samsung or SmartThings. Device and service names belong to their owners.",
+    "Smart Things: Remote Control is operated by Mila Veenstra. Use of the SmartThings name, trademarks and brand elements is based on a signed trademark license and brand authorization agreement with Samsung Electronics Co., Ltd. This does not mean that Samsung operates the app or provides its customer support.",
 };
 
 export const app = {
-  id: PLACEHOLDER, // App Store ID — the app is not in the store yet
-  url: "https://apps.apple.com/app/idPLACEHOLDER", // PLACEHOLDER
+  id: "6757602001",
+  url: "https://apps.apple.com/app/id6757602001",
   platform: "iPhone",
+  minIOS: "18.6",
+  category: "Utilities",
 };
 
 export const nav = [
@@ -37,7 +38,7 @@ export const heroChecks = ["TV, AC, lights & speakers", "Rooms for every space",
 export const steps = [
   {
     title: "Download the app",
-    text: "Get Smart Things Home Manager on your iPhone from the App Store.",
+    text: "Get Smart Things: Remote Control on your iPhone from the App Store. It’s free.",
   },
   {
     title: "Add a device",
@@ -54,7 +55,7 @@ export const devices = [
   {
     key: "tv",
     name: "TV & casting",
-    text: "Play photos, videos and music on the TV over AirPlay, or mirror your iPhone screen. Stop playback in one tap.",
+    text: "Use your phone as a TV remote with navigation, channels and volume. Play photos and videos over AirPlay or mirror your screen.",
     img: "/images/phone-tv.webp",
   },
   {
@@ -133,23 +134,27 @@ export const appScreens = [
 ];
 
 export const specs: [string, string][] = [
-  ["Platform", "iPhone"],
+  ["Compatibility", "iPhone with iOS 18.6 or later"],
   ["Ways to connect", "Apple Home (HomeKit), Wi‑Fi, AirPlay, Screen Mirroring"],
   ["Devices", "TVs, speakers, air conditioners and thermostats, lights, plugs and power strips, switches, locks, sensors, hubs, air purifiers, showers and faucets"],
   ["Organize", "Rooms: Living room, Bedroom, Kitchen, Office, Kids room"],
-  ["Home screen", "Temperature, humidity and air quality at the top"],
+  ["Home screen", "Local weather at the top: temperature, humidity and air quality"],
+  ["Languages", "English and 20 more"],
+  ["Category", "Utilities"],
 ];
 
 export type Faq = { q: string; a: string; topic: "Connecting" | "Devices" | "Subscription" };
 
 export const faq: Faq[] = [
+  { topic: "Connecting", q: "Do I need an account?", a: "No. The app works without registration or an account." },
   { topic: "Connecting", q: "How do I add a device?", a: "Tap + on the Home screen and choose Apple Home for accessories with a HomeKit setup code, or Wi‑Fi for TVs, speakers and soundbars on your network. Then name the device and pick a room." },
   { topic: "Connecting", q: "My TV or speaker doesn’t show up", a: "Make sure the device is on and connected to the same Wi‑Fi as your iPhone, then tap Search Again. If your iPhone isn’t on Wi‑Fi, the app will ask you to open Wi‑Fi Settings." },
   { topic: "Connecting", q: "Why does the app ask for Local Network access?", a: "It needs it to find TVs, speakers and soundbars on your Wi‑Fi. You can change this later in iPhone Settings." },
   { topic: "Connecting", q: "My TV asks to allow the connection", a: "Select Allow on the TV with the TV remote to finish. Some TVs show a 4‑digit code instead: type it into the app." },
   { topic: "Devices", q: "How do rooms work?", a: "Tap Add room, give it a name and type, then choose which devices belong to it. Inside a room you can turn everything off at once." },
   { topic: "Devices", q: "How do I cast photos or videos to the TV?", a: "Open the Cast tab, choose AirPlay and pick photos or videos from your library. To show your whole screen, choose Screen Mirroring." },
+  { topic: "Devices", q: "Why does the app ask for my location?", a: "To show local weather on the Home screen. You can turn it off in iPhone Settings. The app doesn’t keep a location history." },
   { topic: "Devices", q: "A device says Not responding", a: "Check that it has power and is still on your network, then open it again in the app. For hub devices, make sure the hub itself is online." },
   { topic: "Subscription", q: "How do I cancel my subscription?", a: "Subscriptions are billed through your Apple ID. Manage or cancel them in iPhone Settings, then your name, then Subscriptions. Deleting the app doesn’t cancel an active subscription." },
-  { topic: "Subscription", q: "How do I restore a purchase?", a: "Use Restore in the app with the same Apple ID you paid with. Billing and refunds are handled by Apple." },
+  { topic: "Subscription", q: "How do I restore a purchase?", a: "Use Restore in the app with the same Apple ID you paid with. This also brings back a Lifetime purchase. Billing and refunds are handled by Apple." },
 ];
